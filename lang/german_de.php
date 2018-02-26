@@ -26,6 +26,7 @@ $lang = array (
   "dstar_config"                =>  "D-Star Konfiguration",
   "ysf_config"                  =>  "Yaesu System Fusion Konfiguration",
   "p25_config"                  =>  "P25 Konfiguration",
+  "nxdn_config"                 =>  "NXDN Konfiguration",
   "wifi_config"                 =>  "Wlan Konfiguration",
   "fw_config"                   =>  "Firewall Konfiguration",
   "remote_access_pw"            =>  "Fernzugriff",
@@ -47,6 +48,7 @@ $lang = array (
   "d-star_mode"                 =>  "D-Star Modus",
   "ysf_mode"                    =>  "YSF Modus",
   "p25_mode"                    =>  "P25 Modus",
+  "nxdn_mode"                   =>  "NXDN Modus",
   "mmdvm_display"               =>  "MMDVM Display Typ",
   "mode_hangtime"               =>  "Mode Nachlaufzeit",
   // Config Page - General Configuration
@@ -86,6 +88,9 @@ $lang = array (
   // Config Page - P25 Configuration
   "p25_startup_host"            =>  "P25 Startup Host",
   "p25_nac"                     =>  "P25 NAC",
+  // Config Page - NXDN Configuration
+  "nxdn_startup_host"            =>  "NXDN Startup Host",
+  "nxdn_ran"                     =>  "NXDN RAN",
   // Config Page - Firewall Configuration
   "fw_dash"                     =>  "Tableau Zugriff",
   "fw_irc"                      =>  "ircDDGBateway Remote",
@@ -106,6 +111,8 @@ $lang = array (
   "ysf_net"                     =>  "YSF Netzwerk",
   "p25_radio"                   =>  "P25 Radio",
   "p25_net"                     =>  "P25 Netzwerk",
+  "nxdn_radio"                  =>  "NXDN Radio",
+  "nxdn_net"                    =>  "NXDN Netzwerk",
   // Dashboard Front Page - Calls
   "time"                        =>  "Zeit",
   "mode"                        =>  "Mode",

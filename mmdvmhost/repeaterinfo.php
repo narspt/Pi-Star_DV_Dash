@@ -40,6 +40,7 @@ if (fopen($dmrGatewayConfigFile,'r')) { $configdmrgateway = parse_ini_file($dmrG
   <tr><th colspan="2"><?php echo $lang['modes_enabled'];?></th></tr>
   <tr><?php showMode("D-Star", $mmdvmconfigs);?><?php showMode("DMR", $mmdvmconfigs);?></tr>
   <tr><?php showMode("System Fusion", $mmdvmconfigs);?><?php showMode("P25", $mmdvmconfigs);?></tr>
+  <tr><?php showMode("YSF2DMR", $mmdvmconfigs);?><?php showMode("NXDN", $mmdvmconfigs);?></tr>
 </table>
 <br />
 
@@ -47,6 +48,7 @@ if (fopen($dmrGatewayConfigFile,'r')) { $configdmrgateway = parse_ini_file($dmrG
   <tr><th colspan="2"><?php echo $lang['net_status'];?></th></tr>
   <tr><?php showMode("D-Star Network", $mmdvmconfigs);?><?php showMode("DMR Network", $mmdvmconfigs);?></tr>
   <tr><?php showMode("System Fusion Network", $mmdvmconfigs);?><?php showMode("P25 Network", $mmdvmconfigs);?></tr>
+  <tr><?php showMode("YSF2DMR Network", $mmdvmconfigs);?><?php showMode("NXDN Network", $mmdvmconfigs);?></tr>
   <tr><?php if (!$sock = @fsockopen('www.pistar.uk', 80, $num, $error, 5)) { echo "<td colspan=\"2\" style=\"background:#b00; color:#300;\">".$lang['internet']."</td>\n"; } else { echo "<td colspan=\"2\" style=\"background:#0b0; color:#030;\">".$lang['internet']."</td>\n"; } ?></tr>
 </table>
 <br />
@@ -90,6 +92,12 @@ if (isset($lastHeard[0])) {
         	        }
         	elseif (getActualMode($lastHeard, $mmdvmconfigs) === 'P25') {
         	        echo "<td style=\"background:#f9f;\">Listening P25</td>";
+        	        }
+		elseif ($listElem[2] && $listElem[6] == null && getActualMode($lastHeard, $mmdvmconfigs) === 'NXDN') {
+        	        echo "<td style=\"background:#4aa361;\">RX NXDN</td>";
+        	        }
+        	elseif (getActualMode($lastHeard, $mmdvmconfigs) === 'NXDN') {
+        	        echo "<td style=\"background:#c9f;\">Listening NXDN</td>";
         	        }
         	else {
         	        echo "<td>".getActualMode($lastHeard, $mmdvmconfigs)."</td>";
@@ -136,9 +144,9 @@ if ($dmrMasterHost == '127.0.0.1') {
 		$dmrMasterLine = fgets($dmrMasterFile);
                 $dmrMasterHostF = preg_split('/\s+/', $dmrMasterLine);
 		if ((strpos($dmrMasterHostF[0], '#') === FALSE) && ($dmrMasterHostF[0] != '')) {
-			if ($xlxMasterHost1 == $dmrMasterHostF[2]) { $xlxMasterHost1 = str_replace('_', ' ', $dmrMasterHostF[0]); }
-			if ($dmrMasterHost1 == $dmrMasterHostF[2]) { $dmrMasterHost1 = str_replace('_', ' ', $dmrMasterHostF[0]); }
-			if ($dmrMasterHost2 == $dmrMasterHostF[2]) { $dmrMasterHost2 = str_replace('_', ' ', $dmrMasterHostF[0]); }
+			if ((strpos($dmrMasterHostF[0], 'XLX_') === 0) && ($xlxMasterHost1 == $dmrMasterHostF[2])) { $xlxMasterHost1 = str_replace('_', ' ', $dmrMasterHostF[0]); }
+			if ((strpos($dmrMasterHostF[0], 'BM_') === 0) && ($dmrMasterHost1 == $dmrMasterHostF[2])) { $dmrMasterHost1 = str_replace('_', ' ', $dmrMasterHostF[0]); }
+			if ((strpos($dmrMasterHostF[0], 'DMR+_') === 0) && ($dmrMasterHost2 == $dmrMasterHostF[2])) { $dmrMasterHost2 = str_replace('_', ' ', $dmrMasterHostF[0]); }
 		}
 	}
 	if (strlen($xlxMasterHost1) > 21) { $xlxMasterHost1 = substr($xlxMasterHost1, 0, 19) . '..'; }
@@ -210,6 +218,9 @@ if ( $testMMDVModeYSF == 1 ) { //Hide the YSF information when System Fusion Net
                 if ($ysfRoomTxtLine[0] == $ysfLinkedTo) {
                         $ysfLinkedToTxt = $ysfRoomTxtLine[1];
                 }
+		if ($ysfLinkedTo == "00002") {
+			$ysfLinkedToTxt = "YSF2DMR";
+		}
         }
         if ($ysfLinkedToTxt != "null") { $ysfLinkedToTxt = "Room: ".$ysfLinkedToTxt; } else { $ysfLinkedToTxt = "Linked to: ".$ysfLinkedTo; }
         $ysfLinkedToTxt = str_replace('_', ' ', $ysfLinkedToTxt);
@@ -227,10 +238,24 @@ if ( $testMMDVModeP25 == 1 ) { //Hide the P25 information when P25 Network mode 
 	echo "<table>\n";
 	if (getConfigItem("P25", "NAC", $mmdvmconfigs)) {
 		echo "<tr><th colspan=\"2\">".$lang['p25_radio']."</th></tr>\n";
-		echo "<tr><th>NAC</th><td>".getConfigItem("P25", "NAC", $mmdvmconfigs)."</td></tr>\n";
+		echo "<tr><th style=\"width:70px\">NAC</th><td>".getConfigItem("P25", "NAC", $mmdvmconfigs)."</td></tr>\n";
 	}
 	echo "<tr><th colspan=\"2\">".$lang['p25_net']."</th></tr>\n";
 	echo "<tr><td colspan=\"2\"style=\"background: #ffffff;\">".getActualLink($reverseLogLinesP25Gateway, "P25")."</td></tr>\n";
+	echo "</table>\n";
+}
+
+$testMMDVModeNXDN = getConfigItem("NXDN Network", "Enable", $mmdvmconfigs);
+if ( $testMMDVModeNXDN == 1 ) { //Hide the NXDN information when NXDN Network mode not enabled.
+	echo "<br />\n";
+	echo "<table>\n";
+	if (getConfigItem("NXDN", "RAN", $mmdvmconfigs)) {
+		echo "<tr><th colspan=\"2\">".$lang['nxdn_radio']."</th></tr>\n";
+		echo "<tr><th style=\"width:70px\">RAN</th><td>".getConfigItem("NXDN", "RAN", $mmdvmconfigs)."</td></tr>\n";
+	}
+	echo "<tr><th colspan=\"2\">".$lang['nxdn_net']."</th></tr>\n";
+	echo "<tr><td colspan=\"2\"style=\"background: #ffffff;\">Linked to: TG65000</td></tr>\n";
+	//echo "<tr><td colspan=\"2\"style=\"background: #ffffff;\">".getActualLink($reverseLogLinesP25Gateway, "P25")."</td></tr>\n";
 	echo "</table>\n";
 }
 ?>

@@ -40,6 +40,7 @@ switch($page) {
 
 		exec('ifconfig wlan0',$return);
 		exec('iwconfig wlan0',$return);
+		exec('iw dev wlan0 link',$return);
 		$strWlan0 = implode(" ",$return);
 		$strWlan0 = preg_replace('/\s\s+/', ' ', $strWlan0);
 		if (strpos($strWlan0,'HWaddr') !== false) {
@@ -87,20 +88,28 @@ switch($page) {
 				}
 				//preg_match('/TX Bytes:(\d+ \(\d+.\d+ [K|M|G]iB\))/i',$strWlan0,$result);
 				//$strTxBytes = $result[1];
-				preg_match('/Access Point: ([0-9a-f:]+)/i',$strWlan0,$result);
-				$strBSSID = $result[1];
-				preg_match('/Bit Rate([=:0-9\.]+ Mb\/s)/i',$strWlan0,$result);
-                                $strBitrate = str_replace(':', '', str_replace('=', '', $result[1]));
-				preg_match('/Tx-Power=([0-9]+ dBm)/i',$strWlan0,$result);
-				$strTxPower = $result[1];
-				preg_match('/ESSID:\"([a-zA-Z0-9-_\s]+)\"/i',$strWlan0,$result);
-				$strSSID = str_replace('"','',$result[1]);
-				preg_match('/Link Quality=([0-9]+\/[0-9]+)/i',$strWlan0,$result);
-				$strLinkQuality = $result[1];
-                                if (preg_match('/Signal Level=(-[0-9]+ dBm)/i',$strWlan0,$result)) {
-                                $strSignalLevel = $result[1]; }
-                                if (preg_match('/Signal Level=([0-9]+\/[0-9]+)/i',$strWlan0,$result)) {
-                                $strSignalLevel = $result[1]; }
+				if (preg_match('/Access Point: ([0-9a-f:]+)/i',$strWlan0,$result)) { 
+				$strBSSID = $result[1]; }
+				if (preg_match('/Connected to\ ([0-9a-f:]+)/i',$strWlan0,$result)) { 
+				$strBSSID = $result[1]; }
+				if (preg_match('/Bit Rate([=:0-9\.]+ Mb\/s)/i',$strWlan0,$result)) {
+				$strBitrate = str_replace(':', '', str_replace('=', '', $result[1])); }
+				if (preg_match('/tx bitrate:\ ([0-9\.]+ Mbit\/s)/i',$strWlan0,$result)) {
+				$strBitrate = str_replace(':', '', str_replace('=', '', $result[1])); }
+				if (preg_match('/Tx-Power=([0-9]+ dBm)/i',$strWlan0,$result)) {
+				$strTxPower = $result[1]; }
+				if (preg_match('/ESSID:\"([a-zA-Z0-9-_\s]+)\"/i',$strWlan0,$result)) {
+				$strSSID = str_replace('"','',$result[1]); }
+				if (preg_match('/SSID:\ ([a-zA-Z0-9-_\s]+)/i',$strWlan0,$result)) {
+				$strSSID = str_replace(' freq','',$result[1]); }
+				if (preg_match('/Link Quality=([0-9]+\/[0-9]+)/i',$strWlan0,$result)) {
+				$strLinkQuality = $result[1]; }
+				if (preg_match('/Signal Level=(-[0-9]+ dBm)/i',$strWlan0,$result)) {
+				$strSignalLevel = $result[1]; }
+				if (preg_match('/Signal Level=([0-9]+\/[0-9]+)/i',$strWlan0,$result)) {
+				$strSignalLevel = $result[1]; }
+				if (preg_match('/signal:\ (-[0-9]+ dBm)/i',$strWlan0,$result)) {
+				$strSignalLevel = $result[1]; }
 		}
 		else {
 			$strStatus = '<span style="color:red">Interface is down</span>';
@@ -127,7 +136,7 @@ switch($page) {
 			exec('sudo wpa_cli reconfigure wlan0 && sudo ifdown wlan0 && sleep 3 && sudo ifup wlan0 && sudo wpa_cli scan',$test);
 			echo '<script>window.location.href=\'wifi.php?page=wlan0_info\';</script>';
 		}
-		
+
 	echo '<script type="text/javascript">setTimeout(function () { location.reload(1); }, 15000);</script>
 <div class="infobox">
 <form action="'.$_SERVER['PHP_SELF'].'?page=wlan0_info" method="post">
@@ -158,12 +167,12 @@ Transferred Bytes : ' . $strTxBytes . '<br />
 Connected To : ' . $strSSID . '<br />
 AP Mac Address : ' . $strBSSID . '<br />
 <br />
-Bitrate : ' . $strBitrate . '<br />';
-if ($strTxPower) { echo 'Transmit Power : ' . $strTxPower .'<br />'."\n"; } else { echo "<br />\n"; }
-echo '<br />
-Link Quality : ' . $strLinkQuality . '<br />
+Bitrate : ' . $strBitrate . '<br />
 Signal Level : ' . $strSignalLevel . '<br />
-<br />
+<br />';
+if ($strTxPower) { echo 'Transmit Power : ' . $strTxPower .'<br />'."\n"; } else { echo "<br />\n"; }
+if ($strLinkQuality) { echo 'Link Quality : ' . $strLinkQuality . '<br />'."\n"; } else { echo "<br />\n"; }
+echo '<br />
 <br />
 <br />
 <br />
@@ -229,17 +238,20 @@ Signal Level : ' . $strSignalLevel . '<br />
 		echo "Wifi Settings Updated Successfully\n";
 		system('sudo ifdown wlan0 && sleep 3 && sudo ifup wlan0');
 		header("Refresh:1");
-	
+
 	} elseif(isset($_POST['Scan'])) {
 		$return = '';
 		exec('ifconfig wlan0 | grep -i running | wc -l',$test);
-		sleep(2);
+		// sleep(2); // Removed pointless sleep
 		exec('sudo wpa_cli scan -i wlan0',$return);
-		sleep(5);
+		sleep(8); // Added some time to the scan process to find more APs
 		exec('sudo wpa_cli scan_results -i wlan0',$return);
-		for($shift = 0; $shift < 4; $shift++ ) {
-			array_shift($return);
-		}
+		// This section appears to limit the number of found APs to 4, this seems to have been done to clean up the output.
+		//for($shift = 0; $shift < 4; $shift++ ) {
+		//	array_shift($return);
+		//}
+		unset($return['0']); // This is a better way to clean up;
+		unset($return['1']); // This is a better way to clean up;
 		echo "<br />\n";
 		echo "Networks found : <br />\n";
 		echo "<table>\n";
@@ -273,4 +285,3 @@ echo '
 </body>
 </html>';
 ?>
-

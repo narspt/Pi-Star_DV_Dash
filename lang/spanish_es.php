@@ -26,6 +26,7 @@ $lang = array (
   "dstar_config"                =>  "Configuracion de DSTAR",
   "ysf_config"                  =>  "Configuracion de Yaesu C4FM fusion",
   "p25_config"                  =>  "Configuracion de P25",
+  "nxdn_config"                 =>  "Configuracion de NXDN",
   "wifi_config"                 =>  "Configuracion WIFI",
   "fw_config"                   =>  "Configuracion del cortafuegos",
   "remote_access_pw"            =>  "Contraseña accceso Remoto",
@@ -47,6 +48,7 @@ $lang = array (
   "d-star_mode"                 =>  "Modo D-Star",
   "ysf_mode"                    =>  "Modo YSF",
   "p25_mode"                    =>  "Modo P25",
+  "nxdn_mode"                   =>  "Modo NXDN",
   "mmdvm_display"               =>  "MMDVM Tipo Display",
   "mode_hangtime"               =>  "Modo tiempo de suspension",
   // Config Page - General Configuration
@@ -86,6 +88,9 @@ $lang = array (
   // Config Page - P25 Configuration
   "p25_startup_host"            =>  "P25 Lanzamiento Host",
   "p25_nac"                     =>  "P25 NAC",
+  // Config Page - NXDN Configuration
+  "nxdn_startup_host"           =>  "NXDN Lanzamiento Host",
+  "nxdn_ran"                    =>  "NXDN RAN",
   // Config Page - Firewall Configuration
   "fw_dash"                     =>  "Tablero de acceso",
   "fw_irc"                      =>  "ircDDGBateway Remoto",
@@ -106,6 +111,8 @@ $lang = array (
   "ysf_net"                     =>  "Red de YSF",
   "p25_radio"                   =>  "Radio de P25",
   "p25_net"                     =>  "Red de P25",
+  "nxdn_radio"                  =>  "Radio de NXDN",
+  "nxdn_net"                    =>  "Red de NXDN",
   // Dashboard Front Page - Calls
   "time"                        =>  "Hora",
   "mode"                        =>  "Modo",
